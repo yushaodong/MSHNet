@@ -1,5 +1,6 @@
 r""" MSHNet training (validation) code """
 import argparse
+from tqdm import tqdm
 
 import torch.optim as optim
 import torch.nn as nn
@@ -18,7 +19,7 @@ def train(epoch, model, dataloader, optimizer, training):
     model.train_mode() if training else model.eval()
     average_meter = AverageMeter(dataloader.dataset)
 
-    for idx, batch in enumerate(dataloader):
+    for idx, batch in tqdm(enumerate(dataloader)):
 
         # 1. MSHNet forward pass
         batch = utils.to_cuda(batch)
@@ -46,21 +47,20 @@ def train(epoch, model, dataloader, optimizer, training):
 
 
 if __name__ == '__main__':
-
     # Arguments parsing
     parser = argparse.ArgumentParser(description='MSHNet Pytorch Implementat1ion')
-    parser.add_argument('--datapath', type=str, default='/home/alex/pytorch/data/VOCdevkit')
+    parser.add_argument('--datapath', type=str, default='C:/dataset/pascal5i/VOCdevkit/')
     #parser.add_argument('--datapath', type=str, default='/home/alex/pytorch/data')
     parser.add_argument('--save_path', type=str, default='./resume')
     parser.add_argument('--benchmark', type=str, default='pascal', choices=['pascal', 'coco', 'fss'])
     parser.add_argument('--logpath', type=str, default='')
-    parser.add_argument('--bsz', type=int, default=11)
+    parser.add_argument('--bsz', type=int, default=16)
     parser.add_argument('--shot', type=int, default=1)
     parser.add_argument('--momentum', type=float, default=0.9)
     parser.add_argument('--weight_decay', type=float, default=0.00005)
     parser.add_argument('--lr', type=float, default=0.025)
     parser.add_argument('--niter', type=int, default=300)
-    parser.add_argument('--nworker', type=int, default=12)
+    parser.add_argument('--nworker', type=int, default=4)
     parser.add_argument('--fold', type=int, default=2, choices=[0, 1, 2, 3])
     parser.add_argument('--backbone', type=str, default='resnet50', choices=['vgg16', 'resnet50', 'resnet101'])
     args = parser.parse_args()

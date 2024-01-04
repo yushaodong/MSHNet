@@ -18,7 +18,7 @@ class Correlation:
                 queryIJNorm=queryIJ/(queryIJ.norm(dim=0, p=2, keepdim=True) + eps)
                 supIJ=support_feat[j]#c,hw
                 supIJNorm=supIJ/(supIJ.norm(dim=0, p=2, keepdim=True) + eps)
-                corr=(queryIJNorm.permute(1,0)).matmul(supIJNorm)
+                corr=(queryIJNorm.permute(1,0)).matmul(supIJNorm)                   #相关性
                 corr = corr.clamp(min=0)
                 corr=corr.mean(dim=1,keepdim=True)
                 corr=(corr.permute(1,0)).unsqueeze(0)#1,1,hw

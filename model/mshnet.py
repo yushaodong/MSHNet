@@ -52,19 +52,19 @@ class MsimilarityHyperrelationNetwork(nn.Module):
         sup_feats=[]#shot
         corrs=[]
         with torch.no_grad():
-            query_feats = self.extract_feats(query_img, self.backbone, self.feat_ids, self.bottleneck_ids, self.lids)
+            query_feats = self.extract_feats(query_img, self.backbone, self.feat_ids, self.bottleneck_ids, self.lids)                   #提取Q特征
             for i in range(self.shot):
-                support_feats = self.extract_feats(support_img[:,i,:,:,:], self.backbone, self.feat_ids, self.bottleneck_ids, self.lids)
-                support_feats = self.mask_feature(support_feats, support_mask[:,i,:,:])
-                corr,sups = Correlation.multilayer_correlation(query_feats, support_feats, self.stack_ids)#[corr_l4, corr_l3, corr_l2]
+                support_feats = self.extract_feats(support_img[:,i,:,:,:], self.backbone, self.feat_ids, self.bottleneck_ids, self.lids)#提取S特征，k shots
+                support_feats = self.mask_feature(support_feats, support_mask[:,i,:,:])                                                 #S特征添加mask
+                corr,sups = Correlation.multilayer_correlation(query_feats, support_feats, self.stack_ids)#[corr_l4, corr_l3, corr_l2]  #计算多层相关
                 corrs.append(corr)#s,l,b,c,h,w
                 sup_feats.append(sups)#s,l,n,b,2*c,hw
 
-        logit_mask,loss = self.merge(sup_feats,corrs,gt)
-        if not self.use_original_imgsize:
+        logit_mask,loss = self.merge(sup_feats,corrs,gt)    # 支持特征，相关，gt
+        if not self.use_original_imgsize:                   # 没使用原始图像大小，则插值
             logit_mask = F.interpolate(logit_mask, support_img.size()[-2:], mode='bilinear', align_corners=True)
 
-        return logit_mask,loss
+        return logit_mask,loss                              # 返回分割的mask和loss
 
     def mask_feature(self, features, support_mask):#bchw
         bs=features[0].shape[0]
